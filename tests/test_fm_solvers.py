@@ -2,7 +2,7 @@
 
 Run as:
     cd <repo root>
-    python -m htfm.methods.fm_solvers.tests.test_solvers
+    python -m pytest tests/test_fm_solvers.py
 
 Tests
 -----
@@ -11,9 +11,16 @@ Tests
 3. Empirical convergence order: log-log slope of error vs N should be ~ solver order.
 """
 import math
+
+import pytest
 import torch
 
 from htfm.methods.fm_solvers import build_solver, available_solvers
+
+
+@pytest.fixture
+def solvers():
+    return available_solvers()
 
 
 EXPECTED_ORDER = {
