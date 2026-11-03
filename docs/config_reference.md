@@ -73,6 +73,10 @@ path_conditioning:
   projection: {dim: 128, hidden_dim: 128, dropout: 0.0}
 ```
 
+`path_feature_type` (legacy key, still honoured) selects the feature family:
+`logsignature` (default), or the scalar summaries of the Table 9 ablation,
+`area` = $A(T)=\int_0^1 T_s\,ds$ and `area_terminal` = $(A(T), T_1)$.
+
 For the Student-t clock the feature is the scalar `log V_ν` (set by
 `fm.clock.feature_mode`), so `path_signature` is ignored. Older configs use a
 flat layout (`path_feature_type`, `logsignature_level`, `proj_dim`, …); it is
