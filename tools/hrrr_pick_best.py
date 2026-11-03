@@ -5,22 +5,19 @@ epochs by KR, SR, KS separately (ascending — all lower-is-better), sums the th
 reports the min-rank-sum epoch (ties broken by KS). The chosen (ep) is used for BOTH the
 marginal table and the spatial-eval generation, at a fixed rs across models.
 
-Usage: python tools/hrrr_pick_best.py [rs]     # rs default 25
+Usage: python tools/hrrr_pick_best.py --names HTFM_HRRR_a17 HRRRB_dlpm_a17_s42 [--rs 25]
 """
+import argparse
 import glob
 import json
 import os
 import re
-import sys
 from collections import defaultdict
 
-MODELS = ['HRRRB_lim_a17_s42', 'HRRRB_dlpm_a17_s42']
-TARGET_RS = int(sys.argv[1]) if len(sys.argv) > 1 else 25
 
-
-def load():
+def load(models):
     rows = defaultdict(list)   # (name, rs) -> [(ep, kr, sr, ks)]
-    for name in MODELS:
+    for name in models:
         for jp in glob.glob(os.path.join('models', name, 'hrrr_vil', 'tail_metrics_ep*_rs*_n*.json')):
             m = re.search(r'ep(\d+)_rs(\d+)_', jp)
             if not m:
@@ -50,15 +47,19 @@ def rank_sum_best(entries):
 
 
 def main():
-    rows = load()
-    print(f'=== best epoch by KR+SR+KS rank-sum (rs={TARGET_RS}) ===\n')
-    for name in MODELS:
-        entries = rows.get((name, TARGET_RS), [])
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument('--names', nargs='+', required=True, help='run names under models/')
+    ap.add_argument('--rs', type=int, default=25, help='reverse_steps of the sweep to rank (default 25)')
+    args = ap.parse_args()
+    rows = load(args.names)
+    print(f'=== best epoch by KR+SR+KS rank-sum (rs={args.rs}) ===\n')
+    for name in args.names:
+        entries = rows.get((name, args.rs), [])
         if not entries:
-            print(f'{name} rs{TARGET_RS}: (no results yet)\n')
+            print(f'{name} rs{args.rs}: (no results yet)\n')
             continue
         best_ep, scored = rank_sum_best(entries)
-        print(f'{name} rs{TARGET_RS}:  BEST ep={best_ep}  ({len(entries)} epochs swept)')
+        print(f'{name} rs{args.rs}:  BEST ep={best_ep}  ({len(entries)} epochs swept)')
         print(f"  {'ep':>5} {'ranksum':>8} {'KR':>7} {'SR':>7} {'KS':>7}")
         for ranksum, _ks, ep, kr, sr, ks in scored:
             mark = '  <== best' if ep == best_ep else ''
