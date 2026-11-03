@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Heavy-Tailed Flow Matching via Random Clocks"
+type: software
+authors:
+  - family-names: "TODO"
+    given-names: "TODO"
+preferred-citation:
+  type: conference-paper
+  title: "Heavy-Tailed Flow Matching via Random Clocks"
+  authors:
+    - family-names: "TODO"
+      given-names: "TODO"
+  collection-title: "Advances in Neural Information Processing Systems (NeurIPS)"
+  year: 2026
