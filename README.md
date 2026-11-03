@@ -1,8 +1,8 @@
 # Heavy-Tailed Flow Matching via Random Clocks (HTFM)
 
 Official implementation of **Heavy-Tailed Flow Matching via Random Clocks**
-(NeurIPS 2026) by Zhouhao Yang\*, Yezhen Wang\*, Kenji Kawaguchi, Vladimir Braverman
-and Haoyang Cao (\* equal contribution).
+(NeurIPS 2026) by Zhouhao Yang, Yezhen Wang, Kenji Kawaguchi, Vladimir Braverman
+and Haoyang Cao.
 
 HTFM represents heavy-tailed source distributions as mixtures of
 clock-conditioned Gaussian sources. Conditioned on a realised clock path the
