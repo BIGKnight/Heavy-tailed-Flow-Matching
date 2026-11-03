@@ -50,11 +50,6 @@ hashed, so they can be changed without invalidating checkpoints.
 `alpha`, `reverse_steps` (1000), `rescale_timesteps`, `isotropic`, `clamp_a`,
 `clamp_eps`.
 
-### `gmflow` (optional baseline, not in the paper)
-
-`K` mixture components, `transition_lambda`, `loss`, `sampler`,
-`spectral_weight`; model types `gmflow_ddpm` / `gmflow_ncsnpp`.
-
 ## `path_conditioning` (clock features fed to the network)
 
 ```yaml
@@ -74,8 +69,8 @@ path_conditioning:
 ```
 
 `path_feature_type` (legacy key, still honoured) selects the feature family:
-`logsignature` (default), or the scalar summaries of the Table 9 ablation,
-`area` = $A(T)=\int_0^1 T_s\,ds$ and `area_terminal` = $(A(T), T_1)$.
+`logsignature` (default), or the scalar summaries `area` = $A(T)=\int_0^1 T_s\,ds$
+and `area_terminal` = $(A(T), T_1)$ used in the paper's scalar-summary ablation.
 
 For the Student-t clock the feature is the scalar `log V_ν` (set by
 `fm.clock.feature_mode`), so `path_signature` is ignored. Older configs use a
@@ -109,4 +104,4 @@ size), `batch_size`, then per method: `reverse_steps` (NFE for Euler),
 `deterministic` (ODE sampling for `fm`, DLIM for `dlpm`), `dlim_eta`,
 `clip_denoised`, `clamp_a`, `clamp_eps`. `eval.py --generate N
 --reverse_steps R --solver S` override these at evaluation time; results
-are stored next to the checkpoint and summarised by the drivers in `scripts/`.
+are stored next to the checkpoint under `models/<run>/`.

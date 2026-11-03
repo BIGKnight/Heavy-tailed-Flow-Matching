@@ -100,22 +100,10 @@ def _build_lim(p):
     )
 
 
-def _build_gmflow(p):
-    """GMFlow baseline: pixel-wise GM velocity head + transition loss + GM-SDE/spectral sampler."""
-    from .gmflow import GMFlowProcess
-    g = p.get('gmflow', {}) or {}
-    return GMFlowProcess(device=p['device'], K=g.get('K', 8),
-                         transition_lambda=g.get('transition_lambda', 0.5),
-                         loss=g.get('loss', 'transition'),
-                         sampler=g.get('sampler', 'ode'),
-                         spectral_weight=g.get('spectral_weight', 0.1))
-
-
 METHOD_BUILDERS = {
     'fm':     _build_fm,
     'dlpm':   _build_dlpm,
     'lim':    _build_lim,
-    'gmflow': _build_gmflow,
 }
 
 
