@@ -99,7 +99,14 @@ python tools/eval_fid_12k.py --config cifar10lt/FP13_a17_lev1 --name FP13_a17_le
 
 # HRRR VIL: HTFM-alpha, alpha = 1.7 (NCSN++, 1500 epochs)
 python run.py --config hrrr_vil/HRRR_VIL_alpha17 --name HTFM_HRRR_a17 --method fm --epochs 1500 --check 50
+# tail statistics (KR / SR / KS) of 20k generated fields vs the 2021 test year, Heun with 25 steps
+python tools/eval_hrrr_tails.py --config hrrr_vil/HRRR_VIL_alpha17 --name HTFM_HRRR_a17 \
+    --epoch 1100 --generate 20000 --reverse_steps 25
 ```
+
+`eval.py` computes the generic metrics (FID / precision–recall on images, PRD /
+Wasserstein on 2D data); HRRR fields are evaluated with `tools/eval_hrrr_tails.py`
+or the `scripts/hrrr_tail_sweep.py` driver instead.
 
 Useful flags (all optional, they override the YAML): `--epochs`, `--check`
 (checkpoint frequency), `--check_start`, `--set_seed`, `--resume`,
