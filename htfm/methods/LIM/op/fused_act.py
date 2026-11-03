@@ -1,4 +1,5 @@
 import os
+import sys
 import warnings
 
 import torch
@@ -9,6 +10,12 @@ from torch.utils.cpp_extension import load
 
 
 module_path = os.path.dirname(__file__)
+
+# torch.utils.cpp_extension.load needs `ninja` on PATH; it is normally installed next to
+# the interpreter, so make that directory visible even when the env is not activated.
+_bindir = os.path.dirname(sys.executable)
+if _bindir not in os.environ.get("PATH", "").split(os.pathsep):
+    os.environ["PATH"] = _bindir + os.pathsep + os.environ.get("PATH", "")
 try:
     fused = load(
         "fused",
@@ -18,7 +25,7 @@ try:
         ],
     )
 except Exception as _e:  # no nvcc / ninja: fall back to the pure-PyTorch implementation
-    warnings.warn(f"fused_act: CUDA extension not built ({type(_e).__name__}); using the slower native PyTorch path.")
+    warnings.warn(f"fused_act: CUDA extension not built ({type(_e).__name__}: {str(_e).splitlines()[0][:120]}); using the slower native PyTorch path.")
     fused = None
 
 
