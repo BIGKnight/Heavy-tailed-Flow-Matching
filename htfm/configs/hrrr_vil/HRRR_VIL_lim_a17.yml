@@ -1,0 +1,172 @@
+data:
+  cache_dir: ./data/hrrr/vil
+  channels: 1
+  dataset: hrrr_vil
+  image_size: 128
+  random_flip: false
+  test_years:
+  - 2021
+  train_years:
+  - 2019
+  - 2020
+dlpm:
+  alpha: 1.7
+  input_scaling: false
+  isotropic: true
+  mean_predict: EPSILON
+  rescale_timesteps: true
+  reverse_steps: 4000
+  scale: scale_preserving
+  var_predict: FIXED
+eval:
+  batch_size: 64
+  data_to_generate: 20000
+  dlpm:
+    clip_denoised: false
+    deterministic: false
+    dlim_eta: 0.0
+    reverse_steps: 1000
+  fm:
+    clamp_a: 20
+    clamp_eps: 200
+    clip_denoised: false
+    deterministic: true
+    reverse_steps: 25
+    solver: heun
+  lim:
+    clip_denoised: false
+    deterministic: false
+    reverse_steps: 1000
+  real_data: 17400
+fm:
+  alpha: 1.7
+  clock:
+    path_sampling:
+      group_size: 1
+      resample_interval: 1
+    type: alpha_stable
+  flow_type: straight_line
+  input_scaling: false
+  isotropic: true
+  noise_type: terminal
+  prediction_type: velocity
+  reverse_steps: 25
+  scale: scale_preserving
+lim:
+  alpha: 1.7
+  clamp_a: null
+  clamp_eps: null
+  isotropic: true
+  rescale_timesteps: true
+  reverse_steps: 1000
+method: lim
+model:
+  attn_resolutions:
+  - 16
+  ch: 32
+  ch_mult:
+  - 1
+  - 2
+  - 2
+  - 4
+  - 4
+  channel_mult:
+  - 1
+  - 2
+  - 2
+  - 4
+  - 4
+  conditional: false
+  conv_size: 3
+  dropout: 0.0
+  ema_rate: 0.9999
+  embedding_type: positional
+  fir: true
+  fir_kernel:
+  - 1
+  - 3
+  - 3
+  - 1
+  fourier_scale: 16
+  init_scale: 0.0
+  is_conditional: false
+  is_time_conditional: true
+  learn_variance: false
+  model_channels: 32
+  model_type: lim_ncsnpp
+  name: ncsnpp
+  nonlinearity: swish
+  normalization: GroupNorm
+  num_channels: 1
+  num_heads: 4
+  num_res_blocks: 4
+  num_scales: 1000
+  progressive: output_skip
+  progressive_combine: sum
+  progressive_input: input_skip
+  resamp_with_conv: true
+  resblock_type: biggan
+  scale_by_sigma: false
+  sigma_max: 50
+  sigma_min: 0.01
+  skip_rescale: true
+optim:
+  lr: 0.0001
+  lr_gamma: 0.99
+  lr_step_size: 1000
+  lr_steps: 300000
+  optimizer: adamw
+  schedule: null
+  warmup: 1000
+  weight_decay: 0.0
+path_conditioning:
+  enabled: false
+  injection:
+    global:
+      enabled: false
+      mode: add_to_t
+    modulation:
+      enabled: false
+      target_layers:
+      - middle
+  projection:
+    dim: 128
+    dropout: 0.0
+    hidden_dim: 128
+run:
+  checkpoint_freq: 50
+  epochs: 1500
+  eval_freq: null
+  progress: false
+seed: null
+training:
+  batch_size: 128
+  dlpm:
+    ema_rates:
+    - 0.9999
+    grad_clip: 5.0
+    loss_monte_carlo: mean
+    loss_type: EPS_LOSS
+    lploss: 2.0
+    monte_carlo_inner: 1
+    monte_carlo_outer: 1
+    monte_carlo_t: 1
+  fm:
+    clamp_a: null
+    clamp_eps: null
+    ema_rates:
+    - 0.9999
+    fm_loss_weighting:
+      enabled: false
+    grad_clip: 5.0
+    loss_monte_carlo: mean
+    lploss: 2.0
+    monte_carlo_inner: 1
+    monte_carlo_outer: 1
+    monte_carlo_t: 1
+    robust_exponent: 0.5
+  lim:
+    ema_rates:
+    - 0.9999
+    grad_clip: 5.0
+  num_workers: 2

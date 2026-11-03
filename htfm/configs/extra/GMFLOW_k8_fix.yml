@@ -1,0 +1,73 @@
+data:
+  channels: 3
+  dataset: cifar10_lt
+  image_size: 32
+  long_tail:
+    enabled: true
+    imbalance_ratio: 0.01
+    max_count: 5000
+    metadata_dir: ./data/splits
+    num_classes: 10
+    seed: 42
+  num_classes: 10
+  random_flip: true
+gmflow:
+  # GMFlow baseline (Chen et al., 2025), FIXED port. Two changes vs GMFLOW_k8:
+  #   s_min=0.1        -> lower-bounds the GM component std so the transition-NLL can no
+  #                       longer collapse s->0 (delta-on-target), which had corrupted the
+  #                       learned velocity field (even the ODE sampler produced noise).
+  #   spectral_weight  -> a power-spectrum-matching term gives the spectral field a training
+  #                       gradient (it was gradient-less before, stuck at white noise).
+  #   sampler=ode      -> deterministic mixture-mean-velocity integration (fair GMFlow-ODE),
+  #                       which reflects the learned velocity field directly.
+  K: 8
+  transition_lambda: 0.5
+  spectral: true
+  spectral_weight: 0.1
+  s_min: 0.1
+  sampler: ode
+  loss: transition
+  reverse_steps: 50
+method: gmflow
+model:
+  attn_resolutions:
+  - 16
+  channel_mult:
+  - 1
+  - 2
+  - 2
+  - 2
+  dropout: 0.0
+  learn_variance: false
+  model_channels: 128
+  model_type: gmflow_ddpm
+  num_heads: 4
+  num_res_blocks: 2
+optim:
+  lr: 4.0e-05
+  lr_gamma: 0.99
+  lr_step_size: 1000
+  lr_steps: 300000
+  optimizer: adamw
+  schedule: steplr
+  warmup: 500
+run:
+  checkpoint_freq: 100
+  epochs: 1500
+  eval_freq: null
+  progress: false
+seed: null
+training:
+  batch_size: 100
+  num_workers: 0
+  gmflow:
+    ema_rates:
+    - 0.9999
+    grad_clip: 1.0
+eval:
+  batch_size: 100
+  data_to_generate: 5000
+  real_data: 5000
+  gmflow:
+    reverse_steps: 50
+    deterministic: false

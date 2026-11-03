@@ -1,0 +1,25 @@
+# experiment outputs
+models/
+logs/
+results/
+expr_results/
+eval_files/
+wandb/
+.tmp_runtime/
+
+# data (only data/splits/*.json is versioned)
+data/*
+!data/splits/
+!data/README.md
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
