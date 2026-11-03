@@ -1,0 +1,20 @@
+dataset: hrrr_vil
+nu: 3.0
+epochs: 1500
+batch_size: 32
+lr: 0.0002
+lr_gamma: 0.99
+lr_step: 1000
+warmup: 500
+grad_clip: 5.0
+ema_decay: 0.9999
+ckpt_freq: 100
+out_dir: ./runs/tflow_hrrr_vil_nu3p0
+seed: null
+num_workers: 2
+image_size: 128
+channels: 1
+channel_mult: [1, 1, 2, 2, 4, 4]
+hrrr_cache: ../../data/hrrr/vil
+hrrr_train_years: [2019, 2020]
+param: noise

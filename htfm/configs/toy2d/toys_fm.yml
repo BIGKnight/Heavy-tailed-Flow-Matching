@@ -1,0 +1,200 @@
+# Random seed for reproducibility. null = non-deterministic.
+seed: null
+
+data:
+  # Clip data to [-1, 1] via quantile-based clamping (used with quantile_cutoff)
+  between_minus_1_1: false
+  # Quantile threshold for clipping (1.0 = no clip, 0.99 = clip at 99th percentile)
+  quantile_cutoff: 1.0
+  # Stability α for SαS data distributions (2.0 = Gaussian, < 2.0 = heavy-tailed)
+  data_alpha: 1.7
+  # Dataset name. 2D options: gmm_grid, sas_grid, gmm_2, etc. See bem/datasets/Data.py
+  dataset: gmm_grid     # sas_grid
+  # Isotropic (shared α across dims) vs anisotropic (per-dim α) data noise
+  isotropic: true
+  # Number of GMM components. Must be perfect square for grid layouts (e.g., 9 = 3x3)
+  n_mixture: 9          # must be square. set to None if not a grid mixture
+  # Number of features. 2 for 2D data; 1 projects to first dimension only
+  nfeatures: 2
+  # Data dimensionality (1 or 2)
+  dim: 2
+  # Normalize data to zero mean, unit variance
+  normalized: false
+  # Number of training samples to generate
+  nsamples: 32000
+  # Std dev / noise scale for GMM mixture components
+  std: 0.1
+  # Scale parameter controlling spread of mixture component centers
+  theta: 3.0
+  # Per-component mixture weights (must sum to 1, length = n_mixture)
+  weights:
+  - 0.01
+  - 0.1
+  - 0.3
+  - 0.2
+  - 0.02
+  - 0.15
+  - 0.02
+  - 0.15
+  - 0.05
+
+# Active generative method: 'dlpm', 'fm', or 'lim'
+method: fm
+
+fm:
+  # Lévy stability index α ∈ (0, 2]. Same role as in DLPM
+  alpha: 1.8
+  # Number of Euler ODE integration steps for sampling
+  reverse_steps: 200
+  # Isotropic noise (shared subordinator across spatial dims)
+  isotropic: true
+  # Noise schedule type: 'scale_preserving' or 'scale_exploding'
+  scale: 'scale_preserving'
+  # Scale model input by 1/(1+barsigma_t) for scale_exploding
+  input_scaling: false
+  # Model output: 'velocity' (predict v(t,x)) or 'epsilon' (predict noise, convert to v)
+  prediction_type: 'velocity'
+  # Flow interpolation path: 'straight_line' or other supported flow trajectories
+  flow_type: 'straight_line'
+  noise_type: terminal
+
+eval:
+  # Number of samples to generate for evaluation metrics (FID, PRD, etc.)
+  data_to_generate: 15000
+  # Batch size during sample generation
+  batch_size: 1024
+  # Number of real data samples for metric comparison
+  real_data: 15000
+
+  fm:
+    # Deterministic ODE sampling (FM is always ODE-based)
+    deterministic: true
+    # ODE integration steps for eval (can differ from training reverse_steps)
+    reverse_steps: 50
+    # Clip denoised samples to [-1, 1]
+    clip_denoised: false
+    # Clamp subordinator A during eval sampling. null = no clamp
+    clamp_a: null
+    # Clamp noise ε during eval sampling. null = no clamp
+    clamp_eps: null
+
+model:
+  # Embedding dimension for subordinator A (only used if no_a=false)
+  a_emb_size: 32
+  # Use positional (sinusoidal) embedding for A (false = learnable)
+  a_pos_emb: false
+  # Activation function: 'silu', 'relu', etc.
+  act: silu
+  # Dropout probability in MLP blocks
+  dropout_rate: 0.0
+  # Use GroupNorm in MLP blocks (false = identity norm)
+  group_norm: true
+  # Number of MLP residual blocks
+  nblocks: 4
+  # Hidden units per MLP block
+  nunits: 64
+  # Skip connections in MLP blocks
+  skip_connection: true
+  # Time embedding dimension
+  time_emb_size: 32
+  # Time embedding type: 'learnable', 'sinusoidal', or 'one_dimensional_input'
+  time_emb_type: learnable
+
+  # Disable conditioning on subordinator A (recommended: true)
+  no_a: true
+  # Use only a_t_1 instead of (a_t_0, a_t_1) pair. Only relevant if no_a=false
+  use_a_t: false
+
+  # Learn output variance (requires var_predict='GAMMA' and loss_type='VAR_KL')
+  learn_variance: false
+
+training:
+  # Training batch size
+  batch_size: 1024
+  # DataLoader worker threads (0 = main thread only)
+  num_workers: 0
+
+  fm:
+    # EMA decay rates for model averaging. List of floats, e.g., [0.95]. null = no EMA
+    ema_rates:
+    - 0.95
+    # Max gradient norm for clipping. null = no gradient clipping
+    grad_clip: null
+    # Loss aggregation over MC samples: 'mean', 'median', or 'robust'
+    loss_monte_carlo: mean
+    # p in Lp loss: 2.0 = MSE (L2), 1.0 = L1, -1 = squared L2
+    lploss: 2.
+    # Inner MC samples: number of Gaussian z draws per A sample
+    monte_carlo_inner: 2
+    # Outer MC samples: number of subordinator A draws per data point
+    monte_carlo_outer: 4
+    # Exponent r for robust aggregation E[loss^r]. Should satisfy r < α/2
+    robust_exponent: 0.5
+    # Clamp subordinator A during training. null = no clamp
+    clamp_a: null
+    # Clamp noise ε during training. null = no clamp
+    clamp_eps: null
+    fm_loss_weighting:
+      # Enable per-sample loss weighting
+      enabled: false
+      # Weighting mode: 'none', 'time', 'norm', 'time_norm'
+      mode: none
+
+optim:
+  # Optimizer: 'adamw', 'adam', 'sgd', etc.
+  optimizer: adamw
+  # LR schedule: 'steplr', 'cosine', 'linear', null = constant LR
+  schedule: null
+  # Base learning rate
+  lr: 0.005
+  # Linear warmup steps (0 = no warmup)
+  warmup: 0
+  # Total scheduler steps (for cosine/linear schedules)
+  lr_steps: 2000
+  # Step size for StepLR scheduler
+  lr_step_size: 400
+  # Multiplicative decay factor for StepLR (applied every lr_step_size steps)
+  lr_gamma: 0.99
+
+path_conditioning:
+  # Feature type: 'none' (disabled) or 'logsignature' (truncated log-signature of clock path)
+  path_feature_type: "none"
+  # Log-signature truncation depth (higher = more expressive but higher-dimensional)
+  logsignature_level: 3
+  # Path input channels: 't' = normalized time, 'T' = raw subordinator (cumsum A),
+  # 'effective_T' = effective clock (sigma-weighted). Can combine, e.g., ["t", "T", "effective_T"]
+  path_feature_input_channels: ["t", "effective_T"]
+  # Clock channel normalization: null, 'standardize', or 'scale_by_terminal'
+  path_feature_normalization: null
+  # Signature computation backend: 'numeric' (only option currently)
+  signature_backend: "numeric"
+  # Number of discretization points along the clock path
+  path_discretization_steps: 50
+  # Detach path features from gradient computation (for ablation studies)
+  path_feature_detach: false
+  # Output dimension of path feature projection MLP
+  proj_dim: 32
+  # Hidden dimension in projection MLP (null = defaults to proj_dim)
+  proj_hidden_dim: 32
+  # Dropout in projection MLP
+  proj_dropout: 0.0
+  # Global conditioning: add path embedding to time embedding (additive)
+  global:
+    enabled: false
+    mode: add_to_t
+  # FiLM modulation conditioning: modulate intermediate features via scale/shift
+  modulation:
+    enabled: false
+    # Which model layers to apply FiLM modulation to
+    target_layers: ["middle"]
+
+
+run:
+  # Total training epochs
+  epochs: 40
+  # Evaluate every N epochs. null = no evaluation during training
+  eval_freq: null
+  # Save checkpoint every N epochs. null = save only at end
+  checkpoint_freq: null
+  # Show tqdm progress bar during training
+  progress: false

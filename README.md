@@ -39,10 +39,11 @@ htfm/
     cifar10lt/                      CIFAR10-LT main results and baselines (Tables 1-2)
     cifar10lt_ablation/             signature-order, flow-type, NFE and solver ablations
     hrrr_vil/                       HRRR VIL (Table 1, HRRR columns)
-    extra/                          GMFlow baseline configs (not in the paper)
+    extra/                          GMFlow configs (not used in the paper)
 bem/                                experiment framework (training / eval managers, datasets, metrics)
+baselines/tflow/                    stand-alone t-Flow re-implementation (Table 2 baseline)
 scripts/                            reproduction drivers, see scripts/README.md
-tools/                              HRRR cache builder, FID and tail-metric evaluators
+tools/                              HRRR cache builder, FID / tail-metric / class-coverage / event evaluators
 tests/                              unit tests (python -m pytest)
 docs/                               config reference, logsignature notes
 data/                               see data/README.md
@@ -123,10 +124,11 @@ Useful flags (all optional, they override the YAML): `--epochs`, `--check`
 | HTFM-t, tail degree $p_\nu$ | `fm` | `fm.clock.type: student_t`, `fm.clock.nu: 1.7 / 2.0 / 3.0` |
 | signature order $m$ | `fm` | `path_conditioning.path_signature.level: 1 / 2`; $m=0$ is `path_conditioning.enabled: false` (the `*_no_pc` configs) |
 | source type (terminal vs area) | `fm` | `fm.noise_type: terminal` vs `forward_process` |
+| scalar clock summaries $T_1$, $A(T)$, $(A(T),T_1)$ (Table 9) | `fm` | `path_conditioning.path_feature_type: logsignature` with `level: 1` / `area` / `area_terminal` |
 | flow type (straight-line, signature-linear VE, $\bar t$-linear) | `fm` | `fm.flow_type` (+ `fm.signature_linear_ve.lambda_*`) |
 | LIM | `lim` | `lim.alpha` |
 | DLPM / DLIM | `dlpm` | `dlpm.alpha`; DLIM = `eval.dlpm.deterministic: true, dlim_eta: 0.0` (`--deterministic`) |
-| t-Flow | — | external re-implementation of Pandey et al. (2024), not part of this repository |
+| t-Flow | — | `baselines/tflow/` (our re-implementation of Pandey et al., 2024; own `train.py` / `eval.py`) |
 | GMFlow (not in the paper) | `gmflow` | `htfm/configs/extra/` |
 
 The full list of YAML fields is in [docs/config_reference.md](docs/config_reference.md).
@@ -140,12 +142,18 @@ above. Protocol details are in `scripts/README.md`.
 
 | Paper | Configs (`htfm/configs/…`) | Driver |
 |---|---|---|
-| Table 1, 2D columns ($f_1^{\mathrm{pr}}$, $\alpha_D\in\{1.5,1.8\}$) | `toy2d/ch_sas{15,18}_*` | `scripts/toy2d_suite.py` |
-| Table 1 CIFAR column and Table 2 HTFM rows (FID vs NFE, 5 seeds) | `cifar10lt/FP13_*` | `scripts/cifar10lt_train.py`, `scripts/cifar10lt_eval.py` |
-| Table 2 baselines LIM / DLPM / DLIM | `cifar10lt/FP9_lim_a*_clip`, `cifar10lt/FP13_*` with `--method dlpm`, `cifar10lt/FP12_dlpm_a2` | `scripts/cifar10lt_train.py --baselines`, `scripts/cifar10lt_eval.py` |
+| Table 1, 2D columns ($f_1^{\mathrm{pr}}$, $\alpha_D\in\{1.5,1.8\}$); Figure 4 | `toy2d/ch_sas{15,18}_*` | `scripts/toy2d_suite.py`, `scripts/toy2d_plot_grid.py` |
+| Figure 3 (five 2D toy targets, clock-degree sweep) | `toy2d/toys_fm.yml` with `--dataset checkerboard / two_moons / swiss_roll / rings / olympic_rings` and `--alpha` | `run.py`, `visualize_2d.py` |
+| Table 1 CIFAR column, Table 2 HTFM rows, Table 6 (FID vs NFE, 5 seeds) | `cifar10lt/FP13_*` | `scripts/cifar10lt_train.py`, `scripts/cifar10lt_eval.py` |
+| Table 2 / 6 baselines LIM, DLPM, DLIM, Gaussian DDPM / DDIM | `cifar10lt/FP9_lim_a*_clip`, `cifar10lt/FP13_*` with `--method dlpm`, `cifar10lt/FP12_dlpm_a2` | `scripts/cifar10lt_train.py --baselines`, `scripts/cifar10lt_eval.py --baselines --dlim` |
+| Table 2 t-Flow row | `baselines/tflow/configs/cifar10lt_nu3p0.yml` | `baselines/tflow/train.py`, `eval.py` |
+| Table 3 and Table 10 (minority classes: coverage, TailMass, Recall / KID by Many / Medium / Few) | same runs as Table 2 | `scripts/cifar10lt_generate.py` (50k samples), `scripts/cifar10lt_class_coverage.py`, `tools/train_cifar10_classifier.py` |
 | Table 1 HRRR columns (KR / SR / KS) | `hrrr_vil/HRRR_VIL_{alpha16,alpha17,alpha18,vanilla,nu2_pc_concat,nu3_pc_concat}` | `scripts/hrrr_tail_sweep.py` |
-| Signature-order ablation ($m=0,1,2$) | `cifar10lt_ablation/FP11_*` | `scripts/cifar10lt_eval.py` |
-| Flow-type, NFE and ODE-solver ablations | `cifar10lt_ablation/FP8_*` | `scripts/cifar10lt_eval.py`, `tools/eval_fid_12k.py --solver …` |
+| Table 4 (HRRR event rate, Max KS, Eccentricity KS) | `hrrr_vil/HRRR_VIL_{alpha17,dlpm_a2,dlpm_a17,lim_a17}` | `scripts/hrrr_event_eval.py` |
+| Table 5 (signature order $m=0,1,2$) | `cifar10lt_ablation/FP11_*` | `scripts/cifar10lt_eval.py` |
+| Table 8, Figure 2 (ODE solver, NFE) and flow-type ablation | `cifar10lt_ablation/FP8_*` | `scripts/cifar10lt_eval.py`, `tools/eval_fid_12k.py --solver …` |
+| Table 9 (direct scalar-summary conditioning) | `cifar10lt_ablation/ABL_a17_area*.yml` | `scripts/cifar10lt_eval.py` |
+| Figure 5 (CIFAR10-LT samples by class) | any `cifar10lt/FP13_*` run | `scripts/cifar10lt_sample_grid.py` |
 
 Protocol notes
 
@@ -160,7 +168,14 @@ Protocol notes
   (`tools/hrrr_pick_best.py`).
 - 2D runs train for 300 epochs and report the best checkpoint over
   epochs 100–300 and the NFE grid listed in `scripts/toy2d_suite.py`
-  (24,000 samples vs a 24,000-sample held-out reference set).
+  (24,000 samples vs a 24,000-sample held-out reference set, $k=10$ nearest
+  neighbours for $f_1^{\mathrm{pr}}$).
+- Minority-class metrics (Table 3) use 50,000 samples per model at NFE 100,
+  class labels from a ResNet-18 trained on the balanced CIFAR-10 training set,
+  and per-class Recall / KID over 100 real vs 100 generated samples repeated
+  100 times. HRRR event metrics (Table 4) threshold every field at the 99.9th
+  percentile of the real test pixels and analyse 8-connected exceedance
+  components. Both protocols are spelled out in Appendix H of the paper.
 
 ## Citation
 
