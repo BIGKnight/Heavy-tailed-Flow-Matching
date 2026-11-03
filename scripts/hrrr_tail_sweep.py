@@ -61,14 +61,10 @@ SUMMARY = REPO / 'results' / 'hrrr' / 'tail_sweep_summary.json'
 
 
 def load_rank_sum_best():
-    """tools/hrrr_pick_best.py parses sys.argv at import; shield it."""
+    """rank_sum_best from tools/hrrr_pick_best.py (tools/ is not a package)."""
     spec = importlib.util.spec_from_file_location('hrrr_pick_best', REPO / 'tools' / 'hrrr_pick_best.py')
     mod = importlib.util.module_from_spec(spec)
-    argv, sys.argv = sys.argv, [sys.argv[0]]
-    try:
-        spec.loader.exec_module(mod)
-    finally:
-        sys.argv = argv
+    spec.loader.exec_module(mod)
     return mod.rank_sum_best
 
 
