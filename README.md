@@ -161,10 +161,10 @@ Protocol notes
 }
 ```
 
-## Acknowledgements and license
+## Acknowledgements
 
 The code grew out of the [DLPM](https://github.com/darioShar/DLPM) /
 [BEM](https://github.com/darioShar/bem) code base and vendors components of
-LIM, score_sde and improved-diffusion; see
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the exact files and
-their licenses. <!-- TODO: LICENSE for this repository is still to be decided (bem/ is AGPL-3.0 upstream) -->
+[LIM](https://github.com/UNIST-LIM-Lab/LIM),
+[score_sde](https://github.com/yang-song/score_sde_pytorch) and
+[improved-diffusion](https://github.com/openai/improved-diffusion).
