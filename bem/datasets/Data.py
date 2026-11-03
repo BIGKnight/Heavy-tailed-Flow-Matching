@@ -88,9 +88,14 @@ class Generator(Dataset):
     # generate by replacing self.args by args if it is not ()
     # and replace potentially missing kwargs by thos provided.
     def generate(self, *args, **kwargs):
-        tmp_kwargs = self.kwargs | kwargs        
+        tmp_kwargs = self.kwargs | kwargs
         if args == () and kwargs == {} and self.kwargs == {}:
             raise Exception('No parameters for data generation')
+        # get_dataset passes the union of all 2D options (grid_spacing, theta, ...);
+        # keep only those the chosen generator accepts, unless it takes **kwargs.
+        params = signature(self.generator).parameters
+        if not any(q.kind == q.VAR_KEYWORD for q in params.values()):
+            tmp_kwargs = {k: v for k, v in tmp_kwargs.items() if k in params}
         if args == ():
             self.samples = self.transform(self.generator(*self.args, **tmp_kwargs))
             return self.samples
