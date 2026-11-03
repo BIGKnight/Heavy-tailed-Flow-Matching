@@ -1,7 +1,8 @@
 # Heavy-Tailed Flow Matching via Random Clocks (HTFM)
 
 Official implementation of **Heavy-Tailed Flow Matching via Random Clocks**
-(NeurIPS 2026). <!-- TODO: add paper / arXiv / OpenReview links -->
+(NeurIPS 2026) by Zhouhao Yang\*, Yezhen Wang\*, Kenji Kawaguchi, Vladimir Braverman
+and Haoyang Cao (\* equal contribution). <!-- TODO: paper link -->
 
 HTFM represents heavy-tailed source distributions as mixtures of
 clock-conditioned Gaussian sources. Conditioned on a realised clock path the
@@ -161,16 +162,12 @@ Protocol notes
   epochs 100–300 and the NFE grid listed in `scripts/toy2d_suite.py`
   (24,000 samples vs a 24,000-sample held-out reference set).
 
-## Pretrained checkpoints
-
-<!-- TODO: decide whether to publish the FP13 / HRRR checkpoints (e.g. Hugging Face Hub) and link them here -->
-
 ## Citation
 
 ```bibtex
-@inproceedings{htfm2026,
+@inproceedings{yang2026htfm,
   title     = {Heavy-Tailed Flow Matching via Random Clocks},
-  author    = {TODO},
+  author    = {Yang, Zhouhao and Wang, Yezhen and Kawaguchi, Kenji and Braverman, Vladimir and Cao, Haoyang},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026}
 }
