@@ -57,7 +57,7 @@ def clock_feature_dim_from_cfg(p):
         return 2 if feature_mode == 'both' else 1
     if clock_type == 'alpha_stable':
         ft = pc.get('path_feature_type', 'logsignature')
-        if ft == 'area':            # A(T) scalar (reviewer THiG W2)
+        if ft == 'area':            # A(T) scalar summary of the clock path
             return 1
         if ft == 'area_terminal':   # (A(T), T_1) scalars
             return 2
