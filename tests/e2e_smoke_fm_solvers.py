@@ -1,7 +1,7 @@
 """E2E smoke test: load real FM ckpt, sample 4 images with every solver, diff vs euler.
 
 Run:
-    cd /disk3/yezhen/Experiments/Heavy-tailed-flow-matching
+    cd <repo root>
     CUDA_VISIBLE_DEVICES=3 python -m htfm.methods.fm_solvers.tests.e2e_smoke
 """
 import os

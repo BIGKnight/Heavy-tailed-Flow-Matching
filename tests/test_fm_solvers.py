@@ -1,7 +1,7 @@
 """Correctness tests for ODE solvers.
 
 Run as:
-    cd /disk3/yezhen/Experiments/Heavy-tailed-flow-matching
+    cd <repo root>
     python -m htfm.methods.fm_solvers.tests.test_solvers
 
 Tests

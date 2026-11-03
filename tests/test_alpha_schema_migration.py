@@ -15,7 +15,7 @@ Schema:
 Both must yield identical FlowMatchingLevyProcess.
 
 Run:
-    cd /disk3/yezhen/Experiments/HTFM-refactor
+    cd <repo root>
     python -m htfm.methods.tests.test_alpha_schema_migration
 """
 import torch

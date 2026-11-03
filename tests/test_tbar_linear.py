@@ -8,7 +8,7 @@ bar_T(1)=1. Training samples t exactly on the clock grid {1/T_total, ...,
 (T_total-1)/T_total} to avoid interpolation.
 
 Run:
-    cd /disk3/yezhen/Experiments/HTFM-refactor
+    cd <repo root>
     python -m htfm.methods.tests.test_tbar_linear
 """
 import torch

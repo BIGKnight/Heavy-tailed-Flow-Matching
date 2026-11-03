@@ -11,7 +11,7 @@ Covers:
     code path is bypassed (no behavior change).
 
 Run:
-    cd /disk3/yezhen/Experiments/HTFM-refactor
+    cd <repo root>
     python -m htfm.methods.tests.test_signature_linear_ve
 """
 
