@@ -508,7 +508,7 @@ class PathFeatureEncoder(nn.Module):
                 raise ValueError(f"Unknown signature backend: {backend_name}")
             self._output_dim = self.backend.output_dim(self.n_channels, self.depth)
         elif self.feature_type in ('area', 'area_terminal'):
-            # Reviewer THiG W2 scalar clock summaries: A(T) = ∫_0^1 T_s ds (the
+            # Scalar clock summaries: A(T) = ∫_0^1 T_s ds (the
             # source-covariance scale = level-2 signature area), optionally with the
             # terminal T_1 (≈ level-1 / m=1). No signature backend needed.
             self.backend = None
@@ -602,7 +602,7 @@ class PathFeatureEncoder(nn.Module):
         return features
 
     def _scalar_area_features(self, t_grid, T_raw=None, T_effective=None):
-        """Scalar clock summaries requested by reviewer THiG (W2).
+        """Scalar clock summaries (ablation of the logsignature features).
 
         A(T) = ∫_0^1 T_s ds (the quantity that drives the source covariance
         Σ(T) = 2·A(T); a level-2 signature "area") computed by the trapezoid rule
