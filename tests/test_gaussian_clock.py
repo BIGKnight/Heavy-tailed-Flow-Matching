@@ -8,7 +8,7 @@ Compatible flow_types: straight_line (canonical), tbar_linear (degenerate).
 Incompatible: ot_geodesic, signature_linear_ve.
 
 Run:
-    cd /disk3/yezhen/Experiments/HTFM-refactor
+    cd <repo root>
     python -m htfm.methods.tests.test_gaussian_clock
 """
 import torch

@@ -1,4 +1,5 @@
 import os
+import warnings
 
 import torch
 from torch.nn import functional as F
@@ -7,13 +8,17 @@ from torch.utils.cpp_extension import load
 
 
 module_path = os.path.dirname(__file__)
-upfirdn2d_op = load(
-    "upfirdn2d",
-    sources=[
-        os.path.join(module_path, "upfirdn2d.cpp"),
-        os.path.join(module_path, "upfirdn2d_kernel.cu"),
-    ],
-)
+try:
+    upfirdn2d_op = load(
+        "upfirdn2d",
+        sources=[
+            os.path.join(module_path, "upfirdn2d.cpp"),
+            os.path.join(module_path, "upfirdn2d_kernel.cu"),
+        ],
+    )
+except Exception as _e:  # no nvcc / ninja: fall back to the pure-PyTorch implementation
+    warnings.warn(f"upfirdn2d: CUDA extension not built ({type(_e).__name__}); using the slower native PyTorch path.")
+    upfirdn2d_op = None
 
 
 class UpFirDn2dBackward(Function):
@@ -143,7 +148,7 @@ class UpFirDn2d(Function):
 
 
 def upfirdn2d(input, kernel, up=1, down=1, pad=(0, 0)):
-    if input.device.type == "cpu":
+    if input.device.type == "cpu" or upfirdn2d_op is None:
         out = upfirdn2d_native(
             input, kernel, up, up, down, down, pad[0], pad[1], pad[0], pad[1]
         )

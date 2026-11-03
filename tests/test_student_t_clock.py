@@ -1,7 +1,7 @@
 """Tests for Student-t clock.
 
 Run:
-    cd /disk3/yezhen/Experiments/Heavy-tailed-flow-matching
+    cd <repo root>
     python -m htfm.methods.tests.test_student_t_clock
 """
 import math

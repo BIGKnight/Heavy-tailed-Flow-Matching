@@ -1,4 +1,5 @@
 import os
+import warnings
 
 import torch
 from torch import nn
@@ -8,13 +9,17 @@ from torch.utils.cpp_extension import load
 
 
 module_path = os.path.dirname(__file__)
-fused = load(
-    "fused",
-    sources=[
-        os.path.join(module_path, "fused_bias_act.cpp"),
-        os.path.join(module_path, "fused_bias_act_kernel.cu"),
-    ],
-)
+try:
+    fused = load(
+        "fused",
+        sources=[
+            os.path.join(module_path, "fused_bias_act.cpp"),
+            os.path.join(module_path, "fused_bias_act_kernel.cu"),
+        ],
+    )
+except Exception as _e:  # no nvcc / ninja: fall back to the pure-PyTorch implementation
+    warnings.warn(f"fused_act: CUDA extension not built ({type(_e).__name__}); using the slower native PyTorch path.")
+    fused = None
 
 
 class FusedLeakyReLUFunctionBackward(Function):
@@ -84,7 +89,7 @@ class FusedLeakyReLU(nn.Module):
 
 
 def fused_leaky_relu(input, bias, negative_slope=0.2, scale=2 ** 0.5):
-    if input.device.type == "cpu":
+    if input.device.type == "cpu" or fused is None:
         rest_dim = [1] * (input.ndim - bias.ndim - 1)
         return (
             F.leaky_relu(
